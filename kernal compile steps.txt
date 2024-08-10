@@ -1,0 +1,92 @@
+
+sudo apt-get install libssl-dev
+
+uname -r
+download the source code
+unzip mptcp-mptcp_v0.96.zip
+ls -l
+cd mptcp-mptcp_v0.96
+ls -l
+make clean
+make menuconfig
+#Enable Networking options under TCP/IP network and save .config
+#Edit .config and disable cer check and BTF
+
+
+sudo vi.config
+#Finally make deb package
+make deb-pkg
+
+#After compile:
+
+sudo dpkg -i ../linux-headers-5.4.243_5.4.243-1_amd64.deb
+sudo dpkg -i ../linux-libc-dev_5.4.243-1_amd64.deb
+sudo dpkg -i ../linux-image-5.4.243_5.4.243-1_amd64.deb
+sudo dpkg -i ../linux-image-5.4.243-dbg_5.4.243-1_amd64.deb
+
+sudo update-grub
+sudo reboot
+uname -r
+
+############################renaming kernal #########################################################
+
+#rename the kernel and its related files in /boot. 
+#This includes renaming the kernel image, initrd image, and the System.map file.assuming your kernel version is 5.4.243:
+
+sudo mv /boot/vmlinuz-5.4.243 /boot/vmlinuz-5.4.243-custom
+sudo mv /boot/initrd.img-5.4.243 /boot/initrd.img-5.4.243-custom
+sudo mv /boot/System.map-5.4.243 /boot/System.map-5.4.243-custom
+
+
+#Edit the GRUB configuration file to add an entry for the renamed kernel. Open /etc/grub.d/40_custom
+sudo nano /etc/grub.d/40_custom
+
+
+#custom menu entry for renamed kernel:
+menuentry 'Custom Linux 5.4.243' {
+    set root='hd0,1'
+    linux /boot/vmlinuz-5.4.243-custom root=/dev/sda1 ro
+    initrd /boot/initrd.img-5.4.243-custom
+}
+
+sudo update-grub
+sudo reboot
+uname -r
+
+
+
+
+
+
+========================
+
+sudo dpkg -i linux-headers-5.4.243_5.4.243-1_amd64.deb
+sudo dpkg -i linux-libc-dev_5.4.243-1_amd64.deb
+sudo dpkg -i linux-image-5.4.243_5.4.243-1_amd64.deb
+sudo dpkg -i linux-image-5.4.243-dbg_5.4.243-1_amd64.deb
+
+
+reboot and got to cmd by pressing c
+
+ls
+(hd0) (hd0,msdos1) (hd0,msdos2)
+ls (hd0,msdos1)/
+
+-----
+goto
+sudo nano /etc/grub.d/40_custom
+
+add this 
+
+
+menuentry 'Custom Linux 5.4.243' {
+    set root='hd0,gpt3'
+    linux /boot/vmlinuz-5.4.243-custom root=/dev/sda3 ro
+    initrd /boot/initrd.img-5.4.243-custom
+}
+
+sudo update-grub
+uname -r
+sysctl net.mptcp
+
+
