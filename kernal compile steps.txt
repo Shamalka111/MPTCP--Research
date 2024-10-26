@@ -89,4 +89,86 @@ sudo update-grub
 uname -r
 sysctl net.mptcp
 
+-------------------------------------------------------
+##go to specific folder (this works for inly module type##
+cd net/mptcp
+make -C /lib/modules/$(uname -r)/build M=$(pwd) modules
 
+sudo make -C /lib/modules/$(uname -r)/build M=$(pwd) modules_install
+sudo depmod -a
+
+sudo modprobe -r mptcp
+sudo modprobe mptcp
+lsmod | grep mptcp
+-------------------------------------------------------
+
+###get logs from kernal
+
+dmesg
+sudo dmesg -w | sudo tee -a /var/log/kernel_debug.log
+sudo journalctl -f | sudo tee /var/log/system_debug.log
+
+#view logs
+sudo less /var/log/system_debug.log
+sudo less /var/log/kernel_debug.log
+sudo journalctl -k -f
+
+##continuously monitoring the kernel log with:
+dmesg -w
+
+-------------------------------------------------
+#verify
+
+sudo sysctl -a | grep mptcp
+
+
+-----------------------------------------------
+
+make clean
+make -j$(nproc)
+sudo make modules_install
+sudo make install
+sudo update-grub
+sudo reboot
+
+-------------------------
+##speed up the process
+##build process will terminate with any error messages if have
+
+fakeroot make -j$(nproc)
+sudo make modules_install
+sudo make install
+sudo update-grub
+sudo reboot
+
+###After the build finishes, you can check whether it is successful by running
+
+echo $?
+##if 0 fine
+
+
+
+
+========================================================
+
+#enable PMTU Discovery
+sudo sysctl -w net.ipv4.ip_no_pmtu_disc=0
+
+### 0: Enables PMTU Discovery (default).
+### 1: Disables PMTU Discovery (useful for testing).
+
+make this as permenaet
+nano /etc/sysctl.conf
+#Add net.ipv4.ip_no_pmtu_disc = 0
+sudo sysctl -p
+
+
+##verify
+ip route show cache
+
+
+=========================================
+
+#search
+
+grep -rnw 'ADDRCONF(NETDEV_CHANGE)' .
